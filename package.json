@@ -5,13 +5,13 @@
   "packageManager": "pnpm@10.3.0",
   "description": "",
   "license": "MIT",
-  "homepage": "https://github.com/antfu/unplugin-vue-gen-routes#readme",
+  "homepage": "https://github.com/pot-code/unplugin-vue-gen-routes#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/antfu/unplugin-vue-gen-routes.git"
+    "url": "git+https://github.com/pot-code/unplugin-vue-gen-routes.git"
   },
   "bugs": {
-    "url": "https://github.com/antfu/unplugin-vue-gen-routes/issues"
+    "url": "https://github.com/pot-code/unplugin-vue-gen-routes/issues"
   },
   "keywords": [
     "unplugin",
