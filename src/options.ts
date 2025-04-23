@@ -100,7 +100,7 @@ export type _RoutesFolder = string | RoutesFolderOption
 export type RoutesFolder = _RoutesFolder[] | _RoutesFolder
 
 /**
- * unplugin-vue-router plugin options.
+ * unplugin-vue-gen-routes plugin options.
  */
 export interface Options {
   output?: string

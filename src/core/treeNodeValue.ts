@@ -204,7 +204,7 @@ export type TreeNodeValue = TreeNodeValueStatic | TreeNodeValueParam | TreeNodeV
 
 export interface TreeNodeValueOptions extends ParseSegmentOptions {
   /**
-   * Format of the route path. Defaults to `file` which is the format used by unplugin-vue-router and matches the file
+   * Format of the route path. Defaults to `file` which is the format used by unplugin-vue-gen-routes and matches the file
    * structure (e.g. `index`, ``, or `users/[id]`). In `path` format, routes are expected in the format of vue-router
    * (e.g. `/` or '/users/:id' ).
    *

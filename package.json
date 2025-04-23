@@ -18,7 +18,13 @@
     "vite",
     "webpack",
     "rollup",
-    "transform"
+    "vue-router",
+    "pages",
+    "filesystem",
+    "types",
+    "typed",
+    "vue",
+    "router"
   ],
   "exports": {
     ".": {
@@ -45,7 +51,9 @@
       "import": "./dist/types.js",
       "require": "./dist/types.cjs"
     },
-    "./*": "./*"
+    "./client": {
+      "types": "./client.d.ts"
+    }
   },
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -59,7 +67,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "client.d.ts"
   ],
   "scripts": {
     "build": "tsup",

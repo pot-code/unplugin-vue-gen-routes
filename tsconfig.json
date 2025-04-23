@@ -11,9 +11,11 @@
     "noImplicitThis": false,
     "esModuleInterop": true,
     "paths": {
-      "unplugin-vue-router": ["./src/index.ts"],
-      "unplugin-vue-router/types": ["./src/types.ts"]
+      "unplugin-vue-gen-routes": ["./src/index.ts"],
+      "unplugin-vue-gen-routes/types": ["./src/types.ts"],
+      "unplugin-vue-gen-routes/runtime": ["./src/runtime.ts"]
     }
   },
+  "include": ["./src/**/*.ts", "./src/*.d.ts", "./client.d.ts", "./tests/**/*.ts,"],
   "exclude": ["dist", "eslint.config.js"]
 }

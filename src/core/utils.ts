@@ -4,7 +4,7 @@ import type { RouteRecordOverride, TreeRouteParam } from './treeNodeValue'
 import { pascalCase } from 'scule'
 
 export function warn(msg: string, type: 'warn' | 'error' | 'debug' = 'warn'): void {
-  console[type](`⚠️  [unplugin-vue-router]: ${msg}`)
+  console[type](`⚠️  [unplugin-vue-gen-routes]: ${msg}`)
 }
 
 export function logTree(tree: TreeNode, log: (str: string) => any) {
