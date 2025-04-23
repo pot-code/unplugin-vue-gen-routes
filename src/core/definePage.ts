@@ -6,7 +6,6 @@ import { parseObjectNodeToJavascriptObject } from '../utils/babel'
 import { warn } from './utils'
 
 const MACRO_DEFINE_PAGE = 'definePage'
-export const MACRO_DEFINE_PAGE_QUERY = /[?&]definePage\b/
 
 function isStringLiteral(node: Node | null | undefined): node is StringLiteral {
   return node?.type === 'StringLiteral'

@@ -12,7 +12,7 @@ export function getRouteBlock(path: string, content: string, options: ResolvedOp
 
   if (!blockStr) return
 
-  let result = parseCustomBlock(blockStr, path, options)
+  const result = parseCustomBlock(blockStr, path, options)
 
   // validation
   if (result) {

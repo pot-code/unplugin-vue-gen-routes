@@ -5,6 +5,7 @@ export default antfu({
   type: 'lib',
   stylistic: false,
   jsonc: false,
+  markdown: false,
   rules: {
     'no-irregular-whitespace': 'off',
     'no-console': 'off',
@@ -14,7 +15,7 @@ export default antfu({
     'node/prefer-global/process': 'off',
     'ts/explicit-function-return-type': 'off',
     'ts/no-explicit-any': 'off',
-    'ts/no-unused-vars': 'warn',
+    'ts/no-unused-vars': ['warn', { argsIgnorePattern: '^_', destructuredArrayIgnorePattern: '^_' }],
     'ts/no-use-before-define': 'off',
   },
   ...globalIgnores(['./node_modules', './playground']),
