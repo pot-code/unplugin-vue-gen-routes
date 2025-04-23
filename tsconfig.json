@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "lib": ["esnext", "DOM"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "esModuleInterop": true,
+    "paths": {
+      "unplugin-vue-router": ["./src/index.ts"],
+      "unplugin-vue-router/types": ["./src/types.ts"]
+    }
+  },
+  "exclude": ["dist", "eslint.config.js"]
+}

@@ -1,0 +1,35 @@
+export const routes = [
+  {
+    path: '/',
+    name: '/',
+    component: () => import('/Users/pot/Developer/opensource/unplugin-vue-gen-routes/playground/src/pages/index.vue'),
+    /* no children */
+  },
+  {
+    path: '/system',
+    /* internal name: '/system' */
+    /* no component */
+    children: [
+      {
+        path: 'department',
+        name: '/system/department',
+        component: () => import('/Users/pot/Developer/opensource/unplugin-vue-gen-routes/playground/src/pages/system/department.vue'),
+        /* no children */
+        meta: {
+          "title": "department",
+          "layout": false
+        }
+      },
+      {
+        path: 'user',
+        name: '/system/user',
+        component: () => import('/Users/pot/Developer/opensource/unplugin-vue-gen-routes/playground/src/pages/system/user.vue'),
+        /* no children */
+        meta: {
+          "title": "user",
+          "layout": false
+        }
+      }
+    ],
+  }
+]
