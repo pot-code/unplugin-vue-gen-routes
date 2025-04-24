@@ -13,6 +13,8 @@ A powerful route generator plugin for Vue.js applications using [unplugin](https
 
 ## Installation
 
+> ⚠️ vite and esbuild are not supported
+
 ```bash
 # Using pnpm
 pnpm add -D Unplugin-vue-gen-routes
@@ -44,7 +46,14 @@ export default defineConfig({
 
 ```
 
-2. Create your Vue components following the file-based routing convention:
+
+2. Add type to env.d.ts:
+
+```ts
+/// <reference types="unplugin-vue-gen-routes/client" />
+```
+
+3. Create your Vue components following the file-based routing convention:
 
 ```
 src/
@@ -54,6 +63,21 @@ src/
     users/
       [id].vue       # /users/:id dynamic route
       index.vue      # /users route
+```
+
+4. Routes will be generated in `src/router/routes.gen.ts` you can import as you wish.
+
+```ts
+import { createWebHistory, createRouter } from 'vue-router'
+
+import { routes } from './routes.gen'
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+})
+
+export default router
 ```
 
 ## Configuration Options
