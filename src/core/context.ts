@@ -1,24 +1,19 @@
-import type { ResolvedOptions, ServerContext } from '../options'
+import type { ResolvedOptions } from '../options'
 import type { HandlerContext } from './RoutesFolderWatcher'
 import type { TreeNode } from './tree'
 import { promises as fs } from 'node:fs'
 import fg from 'fast-glob'
 import { dirname, relative, resolve } from 'pathe'
-import { generateDTS as _generateDTS } from '../codegen/generateDTS'
-import { generateRouteNamedMap } from '../codegen/generateRouteMap'
 import { generateRouteRecord } from '../codegen/generateRouteRecords'
 import { getRouteBlock } from './customBlock'
 import { extractDefinePageMeta, extractDefinePageNameAndPath } from './definePage'
 import { EditableTreeNode } from './extendRoutes'
-import { MODULE_ROUTES_PATH, MODULE_VUE_ROUTER_AUTO } from './moduleConstants'
 import { resolveFolderOptions, RoutesFolderWatcher } from './RoutesFolderWatcher'
 import { PrefixTree } from './tree'
 import { asRoutePath, ImportsMap, logTree, throttle } from './utils'
 
 export function createRoutesContext(options: ResolvedOptions) {
-  const { dts: preferDTS, root, routesFolder } = options
-  const dts =
-    preferDTS === false ? false : preferDTS === true ? resolve(root, 'typed-router.d.ts') : resolve(root, preferDTS)
+  const { routesFolder } = options
 
   const routeTree = new PrefixTree(options)
   const editableRoutes = new EditableTreeNode(routeTree)
@@ -113,9 +108,6 @@ export function createRoutesContext(options: ResolvedOptions) {
     if (triggerExtendRoute) {
       await options.extendRoute?.(new EditableTreeNode(node))
     }
-
-    // TODO: trigger HMR vue-router/auto
-    server?.updateRoutes()
   }
 
   async function updatePage({ filePath, routePath }: HandlerContext) {
@@ -134,8 +126,6 @@ export function createRoutesContext(options: ResolvedOptions) {
   function removePage({ filePath, routePath }: HandlerContext) {
     logger.log(`remove "${routePath}" for "${filePath}"`)
     routeTree.removeChild(filePath)
-    // TODO: HMR vue-router/auto
-    server?.updateRoutes()
   }
 
   function setupWatcher(watcher: RoutesFolderWatcher) {
@@ -166,36 +156,6 @@ export function createRoutesContext(options: ResolvedOptions) {
     return routes
   }
 
-  function generateDTS(): string {
-    return _generateDTS({
-      vueRouterModule: MODULE_VUE_ROUTER_AUTO,
-      routesModule: MODULE_ROUTES_PATH,
-      routeNamedMap: generateRouteNamedMap(routeTree),
-    })
-  }
-
-  let lastDTS: string | undefined
-  async function _writeConfigFiles() {
-    logger.time('writeConfigFiles')
-
-    if (options.beforeWriteFiles) {
-      await options.beforeWriteFiles(editableRoutes)
-      logger.timeLog('writeConfigFiles', 'beforeWriteFiles()')
-    }
-
-    logTree(routeTree, logger.log)
-    if (dts) {
-      const content = generateDTS()
-      if (lastDTS !== content) {
-        await fs.mkdir(dirname(dts), { recursive: true })
-        await fs.writeFile(dts, content, 'utf-8')
-        logger.timeLog('writeConfigFiles', 'wrote dts file')
-        lastDTS = content
-      }
-    }
-    logger.timeEnd('writeConfigFiles')
-  }
-
   let lastRoutes: string | undefined
   async function _writeRoutes() {
     logger.time('writeRoutes')
@@ -214,7 +174,6 @@ export function createRoutesContext(options: ResolvedOptions) {
   // debounce of 100ms + throttle of 500ms
   // => Initially wait 100ms (renames are actually remove and add but we rather write once) (debounce)
   // subsequent calls after the first execution will wait 500ms-100ms to execute (throttling)
-  const writeConfigFiles = throttle(_writeConfigFiles, 500, 100)
 
   const writeRoutes = throttle(_writeRoutes, 500, 100)
 
@@ -225,16 +184,9 @@ export function createRoutesContext(options: ResolvedOptions) {
     }
   }
 
-  let server: ServerContext | undefined
-  function setServerContext(_server: ServerContext) {
-    server = _server
-  }
-
   return {
     scanPages,
-    writeConfigFiles,
     writeRoutes,
-    setServerContext,
     stopWatcher,
     generateRoutes,
   }

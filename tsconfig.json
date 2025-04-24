@@ -1,7 +1,10 @@
 {
   "compilerOptions": {
     "target": "es2017",
-    "lib": ["esnext", "DOM"],
+    "lib": [
+      "esnext",
+      "DOM"
+    ],
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
@@ -11,11 +14,26 @@
     "noImplicitThis": false,
     "esModuleInterop": true,
     "paths": {
-      "unplugin-vue-gen-routes": ["./src/index.ts"],
-      "unplugin-vue-gen-routes/types": ["./src/types.ts"],
-      "unplugin-vue-gen-routes/runtime": ["./src/runtime.ts"]
+      "unplugin-vue-gen-routes": [
+        "./src/index.ts"
+      ],
+      "unplugin-vue-gen-routes/types": [
+        "./src/types.ts"
+      ],
+      "unplugin-vue-gen-routes/runtime": [
+        "./src/runtime.ts"
+      ]
     }
   },
-  "include": ["./src/**/*.ts", "./src/*.d.ts", "./client.d.ts", "./tests/**/*.ts,"],
-  "exclude": ["dist", "eslint.config.js"]
+  "include": [
+    "./src/**/*.ts",
+    "./src/*.d.ts",
+    "./client.d.ts",
+    "./tests/**/*.ts,"
+  ],
+  "exclude": [
+    "dist",
+    "eslint.config.js",
+    "playground"
+  ]
 }

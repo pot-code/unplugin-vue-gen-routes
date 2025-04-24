@@ -2,10 +2,16 @@ import antfu from '@antfu/eslint-config'
 import { globalIgnores } from 'eslint/config'
 
 export default antfu({
+  ...globalIgnores(['./node_modules', './playground']),
   type: 'lib',
   stylistic: false,
   jsonc: false,
   markdown: false,
+  astro: false,
+  svelte: false,
+  solid: false,
+  toml: false,
+  react: false,
   rules: {
     'no-irregular-whitespace': 'off',
     'no-console': 'off',
@@ -18,5 +24,4 @@ export default antfu({
     'ts/no-unused-vars': ['warn', { argsIgnorePattern: '^_', destructuredArrayIgnorePattern: '^_' }],
     'ts/no-use-before-define': 'off',
   },
-  ...globalIgnores(['./node_modules', './playground']),
 })

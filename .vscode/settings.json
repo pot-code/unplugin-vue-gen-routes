@@ -1,3 +1,4 @@
 {
-  "eslint.experimental.useFlatConfig": true
+  "vue.complete.casing.props": "autoKebab",
+  "vue.complete.casing.tags": "autoKebab",
 }

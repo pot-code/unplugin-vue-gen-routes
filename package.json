@@ -131,6 +131,6 @@
     "vite": "^6.1.0",
     "vitest": "^3.0.5",
     "webpack": "^5.97.1",
-    "unplugin-vue-router": "workspace:*"
+    "unplugin-vue-gen-routes": "workspace:*"
   }
 }

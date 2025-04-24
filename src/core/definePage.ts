@@ -58,7 +58,12 @@ export function extractDefinePageMeta(code: string, id: string) {
     throw new SyntaxError(`[${id}]: definePage() expects an object expression as its only argument`)
   }
 
-  return parseObjectNodeToJavascriptObject(routeRecord as ObjectExpression)
+  if (routeRecord.type !== 'ObjectExpression') {
+    throw new SyntaxError(`[${id}]: definePage() expects an object expression as its only argument`)
+  }
+
+  const object = parseObjectNodeToJavascriptObject(routeRecord as ObjectExpression)
+  return object.meta ? { meta: object.meta } : {}
 }
 
 export function definePageTransform(code: string, id: string) {

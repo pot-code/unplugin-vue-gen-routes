@@ -2,7 +2,6 @@ import type { EditableTreeNode } from './core/extendRoutes.js'
 import type { TreeNode } from './core/tree.js'
 import type { ParseSegmentOptions } from './core/treeNodeValue.js'
 import type { _Awaitable } from './utils/ts.js'
-import { isPackageExists as isPackageInstalled } from 'local-pkg'
 import { resolve } from 'pathe'
 import { getFileBasedRouteName, isArray, warn } from './core/utils.js'
 
@@ -176,13 +175,6 @@ export interface Options {
   routeBlockLang?: 'yaml' | 'yml' | 'json5' | 'json'
 
   /**
-   * Should we generate d.ts files or ont. Defaults to `true` if `typescript` is installed. Can be set to a string of
-   * the filepath to write the d.ts files to. By default it will generate a file named `typed-router.d.ts`.
-   * @default `true`
-   */
-  dts?: boolean | string
-
-  /**
    * Allows inspection by vite-plugin-inspect by not adding the leading `\0` to the id of virtual modules.
    * @internal
    */
@@ -218,7 +210,6 @@ export const DEFAULT_OPTIONS = {
   getRouteName: getFileBasedRouteName,
   importMode: 'async',
   root: process.cwd(),
-  dts: isPackageInstalled('typescript'),
   logs: false,
   _inspect: false,
   pathParser: {
@@ -226,12 +217,6 @@ export const DEFAULT_OPTIONS = {
   },
   watch: !process.env.CI,
 } satisfies Options
-
-export interface ServerContext {
-  invalidate: (module: string) => void
-  updateRoutes: () => Promise<void>
-  reload: () => void
-}
 
 function normalizeRoutesFolderOption(routesFolder: RoutesFolder) {
   return (isArray(routesFolder) ? routesFolder : [routesFolder]).map((routeOption) =>
