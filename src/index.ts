@@ -36,9 +36,6 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options = 
       await ctx.scanPages(resolvedOptions.watch)
       ctx.writeRoutes()
     },
-    buildEnd() {
-      ctx.stopWatcher()
-    },
     transformInclude(id) {
       return filterPageComponents(id)
     },

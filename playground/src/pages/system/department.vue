@@ -1,7 +1,7 @@
 <script setup lang="ts">
 definePage({
   meta: {
-    title: 'department',
+    title: 'departments',
     layout: false,
   },
 })

@@ -9,7 +9,7 @@ A powerful route generator plugin for Vue.js applications using [unplugin](https
 - TypeScript support
 - Hot module replacement (HMR) support
 - Customizable route configuration
-- Integration with rspack/esbuild/webpack/rollup build system
+- Integration with rspack/webpack/rollup build system
 
 ## Installation
 

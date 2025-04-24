@@ -1,5 +1,5 @@
 import type { ResolvedOptions } from '../options'
-import type { HandlerContext } from './RoutesFolderWatcher'
+import type { HandlerContext, RoutesFolderWatcher } from './RoutesFolderWatcher'
 import type { TreeNode } from './tree'
 import { promises as fs } from 'node:fs'
 import fg from 'fast-glob'
@@ -8,7 +8,7 @@ import { generateRouteRecord } from '../codegen/generateRouteRecords'
 import { getRouteBlock } from './customBlock'
 import { extractDefinePageMeta, extractDefinePageNameAndPath } from './definePage'
 import { EditableTreeNode } from './extendRoutes'
-import { resolveFolderOptions, RoutesFolderWatcher } from './RoutesFolderWatcher'
+import { resolveFolderOptions } from './RoutesFolderWatcher'
 import { PrefixTree } from './tree'
 import { asRoutePath, ImportsMap, logTree, throttle } from './utils'
 
@@ -31,6 +31,7 @@ export function createRoutesContext(options: ResolvedOptions) {
   // populated by the initial scan pages
   const watchers: RoutesFolderWatcher[] = []
 
+  // TODO: watcher is relaying on the global context
   async function scanPages(startWatchers = true) {
     if (options.extensions.length < 1) {
       throw new Error('"extensions" cannot be empty. Please specify at least one extension.')
@@ -46,9 +47,9 @@ export function createRoutesContext(options: ResolvedOptions) {
       routesFolder
         .map((folder) => resolveFolderOptions(options, folder))
         .map((folder) => {
-          if (startWatchers) {
-            watchers.push(setupWatcher(new RoutesFolderWatcher(folder)))
-          }
+          // if (startWatchers) {
+          //   watchers.push(setupWatcher(new RoutesFolderWatcher(folder)))
+          // }
 
           // the ignore option must be relative to cwd or absolute
           const ignorePattern = folder.exclude.map((f) =>

@@ -16,7 +16,7 @@ export const routes = [
         component: () => import('D:/opensource/unplugin-vue-gen-routes/playground/src/pages/system/department.vue'),
         /* no children */
         meta: {
-          "title": "department",
+          "title": "departments",
           "layout": false
         }
       },

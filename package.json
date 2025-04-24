@@ -43,13 +43,13 @@
       "import": "./dist/rollup.js",
       "require": "./dist/rollup.cjs"
     },
-    "./esbuild": {
-      "import": "./dist/esbuild.js",
-      "require": "./dist/esbuild.cjs"
-    },
     "./types": {
-      "import": "./dist/types.js",
-      "require": "./dist/types.cjs"
+      "import": "./dist/types.d.ts",
+      "require": "./dist/types.d.cts"
+    },
+    "./runtime": {
+      "import": "./dist/runtime.js",
+      "require": "./dist/runtime.cjs"
     },
     "./client": {
       "types": "./client.d.ts"
@@ -81,13 +81,13 @@
     "test": "vitest"
   },
   "peerDependencies": {
-    "esbuild": "*",
+    "rspack": "^1",
     "rollup": "^3",
     "vue-router": "^4",
     "webpack": "^4 || ^5"
   },
   "peerDependenciesMeta": {
-    "esbuild": {
+    "rspack": {
       "optional": true
     },
     "rollup": {
