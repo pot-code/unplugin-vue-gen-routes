@@ -166,7 +166,7 @@ export function createRoutesContext(options: ResolvedOptions) {
   // => Initially wait 100ms (renames are actually remove and add but we rather write once) (debounce)
   // subsequent calls after the first execution will wait 500ms-100ms to execute (throttling)
 
-  const writeRoutes = throttle(_writeRoutes, 500, 100)
+  const writeRoutes = throttle(_writeRoutes, 500, 0)
 
   return {
     scanPages,

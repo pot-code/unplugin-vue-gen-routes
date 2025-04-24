@@ -29,6 +29,8 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options = 
     resolvedOptions.exclude,
   )
 
+  ctx.writeRoutes()
+
   return {
     name: 'unplugin-vue-gen-routes',
     enforce: 'pre',
