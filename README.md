@@ -1,6 +1,6 @@
-# Unplugin Vue Route Generator
+# unplugin vue route generator
 
-A powerful route generator plugin for Vue.js applications using Unplugin. This plugin automatically generates Vue Router routes based on your file-based routing structure.
+A powerful route generator plugin for Vue.js applications using [unplugin](https://unplugin.unjs.io/). This plugin automatically generates Vue Router routes based on your file-based routing structure.
 
 ## Features
 
@@ -9,7 +9,7 @@ A powerful route generator plugin for Vue.js applications using Unplugin. This p
 - TypeScript support
 - Hot module replacement (HMR) support
 - Customizable route configuration
-- Integration with Unplugin build system
+- Integration with rspack/esbuild/webpack/rollup build system
 
 ## Installation
 
@@ -26,7 +26,7 @@ yarn add -D Unplugin-vue-gen-routes
 
 ## Usage
 
-1. Configure the plugin in your Rspack configuration:
+1. Configure the plugin in your rsbuild configuration:
 
 ```ts
 import { defineConfig } from '@rsbuild/core'
@@ -37,7 +37,7 @@ export default defineConfig({
   plugins: [pluginVue()],
   tools: {
     rspack: {
-      plugins: [VueGenRoutes({})],
+      plugins: [VueGenRoutes()],
     },
   },
 })
@@ -99,3 +99,7 @@ MIT © [pot-code](https://github.com/pot-code)
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Credits
+
+This plugin is inspired by [unplugin-vue-router](https://github.com/posva/unplugin-vue-router).
