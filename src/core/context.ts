@@ -1,14 +1,15 @@
 import type { ResolvedOptions } from '../options'
-import type { HandlerContext, RoutesFolderWatcher } from './RoutesFolderWatcher'
+import type { HandlerContext } from './RoutesFolderWatcher'
 import type { TreeNode } from './tree'
-import { promises as fs } from 'node:fs'
+import fs from 'node:fs'
 import fg from 'fast-glob'
 import { dirname, relative, resolve } from 'pathe'
 import { generateRouteRecord } from '../codegen/generateRouteRecords'
+import { DefaultLogger, NoopLogger } from '../utils/logger'
 import { getRouteBlock } from './customBlock'
 import { extractDefinePageMeta, extractDefinePageNameAndPath } from './definePage'
 import { EditableTreeNode } from './extendRoutes'
-import { resolveFolderOptions } from './RoutesFolderWatcher'
+import { resolveFolderOptions, RoutesFolderWatcher } from './RoutesFolderWatcher'
 import { PrefixTree } from './tree'
 import { asRoutePath, ImportsMap, logTree, throttle } from './utils'
 
@@ -18,27 +19,18 @@ export function createRoutesContext(options: ResolvedOptions) {
   const routeTree = new PrefixTree(options)
   const editableRoutes = new EditableTreeNode(routeTree)
 
-  const logger = new Proxy(console, {
-    get(target, prop) {
-      const res = Reflect.get(target, prop)
-      if (typeof res === 'function') {
-        return options.logs ? res : () => {}
-      }
-      return res
-    },
-  })
+  const logger = options.logs === false ? new NoopLogger() : new DefaultLogger(options.logs)
 
-  // populated by the initial scan pages
+  let scanned = false
   const watchers: RoutesFolderWatcher[] = []
 
-  // TODO: watcher is relaying on the global context
-  async function scanPages(startWatchers = true) {
+  async function scanPages() {
     if (options.extensions.length < 1) {
       throw new Error('"extensions" cannot be empty. Please specify at least one extension.')
     }
 
     // initial scan was already done
-    if (watchers.length > 0) {
+    if (scanned) {
       return
     }
 
@@ -47,9 +39,7 @@ export function createRoutesContext(options: ResolvedOptions) {
       routesFolder
         .map((folder) => resolveFolderOptions(options, folder))
         .map((folder) => {
-          // if (startWatchers) {
-          //   watchers.push(setupWatcher(new RoutesFolderWatcher(folder)))
-          // }
+          watchers.push(setupWatcher(new RoutesFolderWatcher(folder)))
 
           // the ignore option must be relative to cwd or absolute
           const ignorePattern = folder.exclude.map((f) =>
@@ -81,20 +71,20 @@ export function createRoutesContext(options: ResolvedOptions) {
     for (const route of editableRoutes) {
       await options.extendRoute?.(route)
     }
+
+    scanned = true
   }
 
-  async function writeRouteInfoToNode(node: TreeNode, filePath: string) {
-    const content = await fs.readFile(filePath, 'utf8')
-    // TODO: cache the result of parsing the SFC (in the extractDefinePageAndName) so the transform can reuse the parsing
+  async function flushChangesToNode(node: TreeNode, filePath: string) {
+    const content = fs.readFileSync(filePath, 'utf8')
     node.hasDefinePage ||= content.includes('definePage')
-    // TODO: track if it changed and to not always trigger HMR
     const definedPageNameAndPath = extractDefinePageNameAndPath(content, filePath)
     const definedPageMeta = node.hasDefinePage ? extractDefinePageMeta(content, filePath) : {}
-    // TODO: track if it changed and if generateRoutes should be called again
     const routeBlock = getRouteBlock(filePath, content, options)
-    // TODO: should warn if hasDefinePage and customRouteBlock
-    // if (routeBlock) logger.log(routeBlock)
-    node.setCustomRouteBlock(filePath, {
+    if (node.hasDefinePage && routeBlock) {
+      logger.warn(`"${filePath}" has both "definePage" and "route" block, the "route" block will be ignored.`)
+    }
+    node.update(filePath, {
       ...routeBlock,
       ...definedPageNameAndPath,
       ...definedPageMeta,
@@ -102,52 +92,50 @@ export function createRoutesContext(options: ResolvedOptions) {
   }
 
   async function addPage({ filePath, routePath }: HandlerContext, triggerExtendRoute = false) {
-    logger.log(`added "${routePath}" for "${filePath}"`)
+    logger.info(`added "${routePath}" for "${filePath}"`)
     const node = routeTree.insert(routePath, filePath)
-    await writeRouteInfoToNode(node, filePath)
+    await flushChangesToNode(node, filePath)
 
     if (triggerExtendRoute) {
-      await options.extendRoute?.(new EditableTreeNode(node))
+      options.extendRoute?.(new EditableTreeNode(node))
     }
   }
 
-  async function updatePage({ filePath, routePath }: HandlerContext) {
-    logger.log(`updated "${routePath}" for "${filePath}"`)
+  function updatePage({ filePath, routePath }: HandlerContext) {
+    logger.info(`updated "${routePath}" for "${filePath}"`)
     const node = routeTree.getChild(filePath)
     if (!node) {
       logger.warn(`Cannot update "${filePath}": Not found.`)
       return
     }
-    await writeRouteInfoToNode(node, filePath)
-    await options.extendRoute?.(new EditableTreeNode(node))
+    flushChangesToNode(node, filePath)
+    options.extendRoute?.(new EditableTreeNode(node))
     // no need to manually trigger the update of vue-router/auto-routes because
     // the change of the vue file will trigger HMR
   }
 
   function removePage({ filePath, routePath }: HandlerContext) {
-    logger.log(`remove "${routePath}" for "${filePath}"`)
+    logger.info(`remove "${routePath}" for "${filePath}"`)
     routeTree.removeChild(filePath)
   }
 
+  function onFileChanges(id: string, event: 'create' | 'update' | 'delete') {
+    watchers.forEach((watcher) => watcher.receive(id, event))
+  }
+
   function setupWatcher(watcher: RoutesFolderWatcher) {
-    logger.log(`🤖 Scanning files in ${watcher.src}`)
+    logger.info(`handle file changes in ${watcher.src}`)
 
     return watcher
-      .on('change', async (ctx) => {
-        await updatePage(ctx)
-        writeRoutes()
+      .on('update', (ctx) => {
+        updatePage(ctx)
       })
-      .on('add', async (ctx) => {
-        await addPage(ctx, true)
-        writeRoutes()
+      .on('create', async (ctx) => {
+        addPage(ctx, true)
       })
-      .on('unlink', (ctx) => {
+      .on('delete', (ctx) => {
         removePage(ctx)
-        writeRoutes()
       })
-
-    // TODO: handle folder removal: apparently chokidar only emits a raw event when deleting a folder instead of the
-    // unlinkDir event
   }
 
   function generateRoutes() {
@@ -158,16 +146,18 @@ export function createRoutesContext(options: ResolvedOptions) {
   }
 
   let lastRoutes: string | undefined
-  async function _writeRoutes() {
+  function _writeRoutes() {
     logger.time('writeRoutes')
 
-    logTree(routeTree, logger.log)
+    logTree(routeTree, logger.info)
     const content = generateRoutes()
     if (lastRoutes !== content) {
-      await fs.mkdir(dirname(options.output), { recursive: true })
-      await fs.writeFile(options.output, content, 'utf-8')
+      fs.mkdirSync(dirname(options.output), { recursive: true })
+      fs.writeFileSync(options.output, content, 'utf-8')
       logger.timeLog('writeRoutes', 'wrote routes file')
       lastRoutes = content
+    } else {
+      logger.timeLog('writeRoutes', 'routes file not changed')
     }
     logger.timeEnd('writeRoutes')
   }
@@ -178,17 +168,10 @@ export function createRoutesContext(options: ResolvedOptions) {
 
   const writeRoutes = throttle(_writeRoutes, 500, 100)
 
-  function stopWatcher() {
-    if (watchers.length) {
-      logger.log('🛑 stopping watcher')
-      watchers.forEach((watcher) => watcher.close())
-    }
-  }
-
   return {
     scanPages,
+    onFileChanges,
     writeRoutes,
-    stopWatcher,
     generateRoutes,
   }
 }

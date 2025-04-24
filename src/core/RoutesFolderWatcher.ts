@@ -1,6 +1,5 @@
-import type { FSWatcher } from 'chokidar'
 import type { ResolvedOptions, RoutesFolderOption, RoutesFolderOptionResolved } from '../options'
-import { watch as fsWatch } from 'chokidar'
+import EventEmitter from 'node:events'
 import path, { resolve } from 'pathe'
 import picomatch from 'picomatch'
 import { appendExtensionListToPattern, asRoutePath } from './utils'
@@ -11,8 +10,8 @@ export class RoutesFolderWatcher {
   extensions: string[]
   filePatterns: string[]
   exclude: string[]
-
-  watcher: FSWatcher
+  #emitter: EventEmitter
+  #fileMatcher: picomatch.Matcher
 
   constructor(folderOptions: RoutesFolderOptionResolved) {
     this.src = folderOptions.src
@@ -21,36 +20,25 @@ export class RoutesFolderWatcher {
     this.extensions = folderOptions.extensions
     // the pattern includes the extenions, so we leverage picomatch check
     this.filePatterns = folderOptions.pattern
-
-    const isMatch = picomatch(this.filePatterns, {
+    this.#emitter = new EventEmitter()
+    this.#fileMatcher = picomatch(this.filePatterns, {
       ignore: this.exclude,
       // it seems like cwd isn't used by picomatch
       // so we need to use path.relative to get the relative path
       // cwd: this.src,
     })
-
-    this.watcher = fsWatch('.', {
-      cwd: this.src,
-      ignoreInitial: true,
-      ignorePermissionErrors: true,
-      ignored: (filePath, stats) => {
-        // let folders pass, they are ignored by the glob pattern
-        if (!stats || stats.isDirectory()) {
-          return false
-        }
-
-        return !isMatch(path.relative(this.src, filePath))
-      },
-
-      // TODO: allow user options
-    })
   }
 
-  on(event: 'add' | 'change' | 'unlink' | 'unlinkDir', handler: (context: HandlerContext) => void) {
-    this.watcher.on(event, (filePath: string) => {
-      // console.log('📦 Event', event, filePath)
+  #isMatch(filePath: string) {
+    return this.#fileMatcher(path.relative(this.src, filePath))
+  }
 
-      // ensure consistent absolute path for Windows and Unix
+  on(event: 'create' | 'update' | 'delete', handler: (context: HandlerContext) => void) {
+    this.#emitter.on(event, (filePath: string) => {
+      if (!this.#isMatch(filePath)) {
+        return
+      }
+
       filePath = resolve(this.src, filePath)
 
       handler({
@@ -68,8 +56,12 @@ export class RoutesFolderWatcher {
     return this
   }
 
+  receive(filePath: string, event: 'create' | 'update' | 'delete') {
+    this.#emitter.emit(event, filePath)
+  }
+
   close() {
-    return this.watcher.close()
+    return this.#emitter.removeAllListeners()
   }
 }
 

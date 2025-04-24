@@ -6,7 +6,11 @@ export default defineConfig({
   plugins: [pluginVue()],
   tools: {
     rspack: {
-      plugins: [VueGenRoutes({})],
+      plugins: [
+        VueGenRoutes({
+          logs: 'debug',
+        }),
+      ],
     },
   },
 })

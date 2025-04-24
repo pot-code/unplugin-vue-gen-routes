@@ -111,7 +111,7 @@ export class TreeNode {
    * @param filePath - file path where the custom block is located
    * @param routeBlock - custom block to set
    */
-  setCustomRouteBlock(filePath: string, routeBlock: CustomRouteBlock | undefined) {
+  update(filePath: string, routeBlock: CustomRouteBlock | undefined) {
     this.value.setOverride(filePath, routeBlock)
   }
 

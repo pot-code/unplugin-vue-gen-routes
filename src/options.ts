@@ -147,7 +147,7 @@ export interface Options {
    *
    * @param route - {@link EditableTreeNode} of the route to extend
    */
-  extendRoute?: (route: EditableTreeNode) => _Awaitable<void>
+  extendRoute?: (route: EditableTreeNode) => void
 
   /**
    * Allows to do some changes before writing the files. This will be invoked **every time** the files need to be written.
@@ -183,7 +183,7 @@ export interface Options {
   /**
    * Activates debug logs.
    */
-  logs?: boolean
+  logs?: false | 'debug' | 'info' | 'warn' | 'error'
 
   /**
    * @inheritDoc
@@ -210,7 +210,7 @@ export const DEFAULT_OPTIONS = {
   getRouteName: getFileBasedRouteName,
   importMode: 'async',
   root: process.cwd(),
-  logs: false,
+  logs: 'warn',
   _inspect: false,
   pathParser: {
     dotNesting: true,

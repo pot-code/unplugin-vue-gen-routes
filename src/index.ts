@@ -33,8 +33,11 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options = 
     name: 'unplugin-vue-gen-routes',
     enforce: 'pre',
     async buildStart() {
-      await ctx.scanPages(resolvedOptions.watch)
+      await ctx.scanPages()
       ctx.writeRoutes()
+    },
+    watchChange(id, change) {
+      ctx.onFileChanges(id, change.event)
     },
     transformInclude(id) {
       return filterPageComponents(id)
