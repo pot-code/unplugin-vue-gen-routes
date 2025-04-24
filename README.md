@@ -47,7 +47,7 @@ export default defineConfig({
 ```
 
 
-2. Add type to env.d.ts:
+2. Add following line to your env.d.ts:
 
 ```ts
 /// <reference types="unplugin-vue-gen-routes/client" />
@@ -86,17 +86,26 @@ The plugin accepts the following configuration options:
 
 ```ts
 interface Options {
-  // Directory containing your route components
-  pagesDir?: string
-
-  // File extensions to consider as route components
-  extensions?: string[]
-
-  // Custom route configuration
-  routes?: RouteConfig[]
-
   // Output file for the generated routes, defaults to 'src/router/routes.gen.ts'
   output?: string
+
+  // Directory to scan for routes, defaults to 'src/pages'
+  routesFolder?: RoutesFolder
+
+  // file extensions to scan for routes, defaults to ['vue']
+  extensions?: string[]
+
+  // exclude folder patterns for routes, support glob patterns, defaults to empty
+  exclude?: string[]
+
+  // file patterns to scan for routes, support glob patterns, defaults to ['**/*']
+  filePatterns?: string[]
+
+  // logging config, if set to false, no logs will be printed.
+  logs: false | 'debug' | 'info' | 'warn' | 'error'
+
+  // watch mode, defaults to true
+  watch?: boolean
 }
 ```
 
