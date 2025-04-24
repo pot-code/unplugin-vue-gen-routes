@@ -81,13 +81,13 @@
     "test": "vitest"
   },
   "peerDependencies": {
-    "rspack": "^1",
+    "@rspack/core": "^1",
     "rollup": "^3",
     "vue-router": "^4",
     "webpack": "^4 || ^5"
   },
   "peerDependenciesMeta": {
-    "rspack": {
+    "@rspack/core": {
       "optional": true
     },
     "rollup": {
