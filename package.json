@@ -83,8 +83,7 @@
   "peerDependencies": {
     "esbuild": "*",
     "rollup": "^3",
-    "vite": ">=3",
-    "vue-router": "^4.5.0",
+    "vue-router": "^4",
     "webpack": "^4 || ^5"
   },
   "peerDependenciesMeta": {
@@ -92,9 +91,6 @@
       "optional": true
     },
     "rollup": {
-      "optional": true
-    },
-    "vite": {
       "optional": true
     },
     "webpack": {
@@ -121,6 +117,7 @@
     "@nuxt/kit": "^3.15.4",
     "@nuxt/schema": "^3.15.4",
     "@types/node": "^22.13.1",
+    "@types/picomatch": "^4.0.0",
     "bumpp": "^10.0.2",
     "nodemon": "^3.1.9",
     "prettier": "^3.5.3",
@@ -128,9 +125,8 @@
     "tsup": "^8.3.6",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3",
-    "vite": "^6.1.0",
+    "unplugin-vue-gen-routes": "workspace:*",
     "vitest": "^3.0.5",
-    "webpack": "^5.97.1",
-    "unplugin-vue-gen-routes": "workspace:*"
+    "webpack": "^5.97.1"
   }
 }

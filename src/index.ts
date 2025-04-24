@@ -2,11 +2,11 @@ import type { UnpluginFactory } from 'unplugin'
 import type { Options } from './types'
 import { join } from 'node:path'
 import { createUnplugin } from 'unplugin'
-import { createFilter } from 'vite'
 import { createRoutesContext } from './core/context'
 import { definePageTransform } from './core/definePage'
 import { appendExtensionListToPattern } from './core/utils'
 import { mergeAllExtensions, resolveOptions } from './options'
+import createFilter from './utils/filter'
 
 export { EditableTreeNode } from './core/extendRoutes'
 
