@@ -23,9 +23,6 @@ export class RoutesFolderWatcher {
     this.#emitter = new EventEmitter()
     this.#fileMatcher = picomatch(this.filePatterns, {
       ignore: this.exclude,
-      // it seems like cwd isn't used by picomatch
-      // so we need to use path.relative to get the relative path
-      // cwd: this.src,
     })
   }
 
