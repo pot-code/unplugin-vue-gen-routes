@@ -1,6 +1,7 @@
 import type { UnpluginFactory } from 'unplugin'
 import type { Options } from './types'
-import { join } from 'node:path'
+import fs from 'node:fs'
+import { dirname, join } from 'node:path'
 import { createUnplugin } from 'unplugin'
 import { createRoutesContext } from './core/context'
 import { definePageTransform } from './core/definePage'
@@ -29,7 +30,11 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options = 
     resolvedOptions.exclude,
   )
 
-  ctx.writeRoutes()
+  // write the routes file before build
+  // or the compile will fail if the routes file is not found
+  const content = ctx.generateRoutes()
+  fs.mkdirSync(dirname(resolvedOptions.output), { recursive: true })
+  fs.writeFileSync(resolvedOptions.output, content, 'utf-8')
 
   return {
     name: 'unplugin-vue-gen-routes',
