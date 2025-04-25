@@ -39,12 +39,12 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options = 
       return definePageTransform(code, id)
     },
     rspack(compiler) {
-      compiler.hooks.beforeCompile.tapAsync('unplugin-vue-gen-routes', () => ctx.scanPages(false))
-      compiler.hooks.watchRun.tapAsync('unplugin-vue-gen-routes', () => ctx.scanPages())
+      compiler.hooks.beforeCompile.tapPromise('unplugin-vue-gen-routes', () => ctx.scanPages(false))
+      compiler.hooks.watchRun.tapPromise('unplugin-vue-gen-routes', () => ctx.scanPages())
     },
     webpack(compiler) {
-      compiler.hooks.beforeCompile.tapAsync('unplugin-vue-gen-routes', () => ctx.scanPages(false))
-      compiler.hooks.watchRun.tapAsync('unplugin-vue-gen-routes', () => ctx.scanPages())
+      compiler.hooks.beforeCompile.tapPromise('unplugin-vue-gen-routes', () => ctx.scanPages(false))
+      compiler.hooks.watchRun.tapPromise('unplugin-vue-gen-routes', () => ctx.scanPages())
     },
     rollup: {
       buildStart() {
