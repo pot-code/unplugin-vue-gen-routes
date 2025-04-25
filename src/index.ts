@@ -1,7 +1,6 @@
 import type { UnpluginFactory } from 'unplugin'
 import type { Options } from './types'
-import fs from 'node:fs'
-import { dirname, join } from 'node:path'
+import { join } from 'node:path'
 import { createUnplugin } from 'unplugin'
 import { createRoutesContext } from './core/context'
 import { definePageTransform } from './core/definePage'
@@ -30,27 +29,27 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options = 
     resolvedOptions.exclude,
   )
 
-  // write the routes file before build
-  // or the compile will fail if the routes file is not found
-  const content = ctx.generateRoutes()
-  fs.mkdirSync(dirname(resolvedOptions.output), { recursive: true })
-  fs.writeFileSync(resolvedOptions.output, content, 'utf-8')
-
   return {
     name: 'unplugin-vue-gen-routes',
     enforce: 'pre',
-    async buildStart() {
-      await ctx.scanPages()
-      ctx.writeRoutes()
-    },
-    watchChange(id, change) {
-      ctx.onFileChanges(id, change.event)
-    },
     transformInclude(id) {
       return filterPageComponents(id)
     },
     transform(code, id) {
       return definePageTransform(code, id)
+    },
+    rspack(compiler) {
+      compiler.hooks.beforeCompile.tapAsync('unplugin-vue-gen-routes', () => ctx.scanPages(false))
+      compiler.hooks.watchRun.tapAsync('unplugin-vue-gen-routes', () => ctx.scanPages())
+    },
+    webpack(compiler) {
+      compiler.hooks.beforeCompile.tapAsync('unplugin-vue-gen-routes', () => ctx.scanPages(false))
+      compiler.hooks.watchRun.tapAsync('unplugin-vue-gen-routes', () => ctx.scanPages())
+    },
+    rollup: {
+      buildStart() {
+        return ctx.scanPages(this.meta.watchMode)
+      },
     },
   }
 }
