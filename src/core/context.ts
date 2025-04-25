@@ -7,7 +7,7 @@ import { dirname, relative, resolve } from 'pathe'
 import { generateRouteRecord } from '../codegen/generateRouteRecords'
 import { DefaultLogger, NoopLogger } from '../utils/logger'
 import { getRouteBlock } from './customBlock'
-import { extractDefinePageMeta, extractDefinePageNameAndPath } from './definePage'
+import { extractDefinePageMeta as extractDefinePageData, MACRO_DEFINE_PAGE } from './definePage'
 import { EditableTreeNode } from './extendRoutes'
 import { resolveFolderOptions, RoutesFolderWatcher } from './RoutesFolderWatcher'
 import { PrefixTree } from './tree'
@@ -49,7 +49,7 @@ export function createRoutesContext(options: ResolvedOptions) {
 
           return fg(folder.pattern, {
             cwd: folder.src,
-            // TODO: do they return the symbolic link path or the original file?
+            // TODO: do they return the symbolic link path or the original file
             // followSymbolicLinks: false,
             ignore: ignorePattern,
           }).then((files) =>
@@ -84,17 +84,15 @@ export function createRoutesContext(options: ResolvedOptions) {
    */
   async function syncOverridesToNode(node: TreeNode, filePath: string) {
     const content = await fs.readFile(filePath, 'utf8')
-    node.hasDefinePage ||= content.includes('definePage')
-    const definedPageNameAndPath = extractDefinePageNameAndPath(content, filePath)
-    const definedPageMeta = node.hasDefinePage ? extractDefinePageMeta(content, filePath) : {}
+    node.hasDefinePage = content.includes(MACRO_DEFINE_PAGE)
+    const definedPageData = node.hasDefinePage ? extractDefinePageData(content, filePath) : {}
     const routeBlock = getRouteBlock(filePath, content, options)
     if (node.hasDefinePage && routeBlock) {
       logger.warn(`"${filePath}" has both "definePage" and "route" block, the "route" block will be ignored.`)
     }
     node.setOverrides(filePath, {
       ...routeBlock,
-      ...definedPageNameAndPath,
-      ...definedPageMeta,
+      ...definedPageData,
     })
   }
 
@@ -161,19 +159,16 @@ export function createRoutesContext(options: ResolvedOptions) {
 
   let lastRoutes: string | undefined
   async function _writeRoutes() {
-    logger.time('writeRoutes')
-
     logTree(routeTree, logger.info)
     const content = generateRoutes()
     if (lastRoutes !== content) {
       await fs.mkdir(dirname(options.output), { recursive: true })
       await fs.writeFile(options.output, content, 'utf-8')
-      logger.timeLog('writeRoutes', 'wrote routes file')
+      logger.debug('writeRoutes', 'wrote routes file')
       lastRoutes = content
     } else {
-      logger.timeLog('writeRoutes', 'routes file not changed')
+      logger.debug('writeRoutes', 'routes file not changed')
     }
-    logger.timeEnd('writeRoutes')
   }
 
   // debounce of 100ms + throttle of 500ms
