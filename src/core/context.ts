@@ -1,7 +1,7 @@
 import type { ResolvedOptions } from '../options'
 import type { HandlerContext } from './RoutesFolderWatcher'
 import type { TreeNode } from './tree'
-import { promises as fs } from 'node:fs'
+import { existsSync, promises as fs } from 'node:fs'
 import fg from 'fast-glob'
 import { dirname, relative, resolve } from 'pathe'
 import { generateRouteRecord } from '../codegen/generateRouteRecords'
@@ -73,6 +73,7 @@ export function createRoutesContext(options: ResolvedOptions) {
       options.extendRoute?.(route)
     }
 
+    await readLastRoutes()
     // write the routes file before build
     // or the compile will fail if the routes file is not found
     await _writeRoutes()
@@ -168,8 +169,20 @@ export function createRoutesContext(options: ResolvedOptions) {
       logger.debug('writeRoutes', 'wrote routes file')
       lastRoutes = content
     } else {
-      logger.debug('writeRoutes', 'routes file not changed')
+      logger.debug('writeRoutes', 'file not changed')
     }
+  }
+
+  /**
+   * read the last routes file
+   */
+  async function readLastRoutes() {
+    if (!existsSync(options.output)) {
+      return
+    }
+
+    const content = await fs.readFile(options.output, 'utf-8')
+    lastRoutes = content
   }
 
   // debounce of 100ms + throttle of 500ms
