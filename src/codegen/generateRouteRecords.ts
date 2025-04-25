@@ -88,7 +88,6 @@ ${indentStr}},`
  * @param filepath - the filepath to the file
  * @param importMode - the import mode to use
  * @param importsMap - the import list to fill
- * @returns
  */
 function generatePageImport(filepath: string, importMode: ResolvedOptions['importMode'], importsMap: ImportsMap) {
   const mode = typeof importMode === 'function' ? importMode(filepath) : importMode

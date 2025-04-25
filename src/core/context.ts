@@ -77,7 +77,12 @@ export function createRoutesContext(options: ResolvedOptions) {
     await _writeRoutes()
   }
 
-  async function flushChangesToNode(node: TreeNode, filePath: string) {
+  /**
+   * extract latest overrides from the file and update the node
+   * @param node the node to be updated
+   * @param filePath route file path
+   */
+  async function syncOverridesToNode(node: TreeNode, filePath: string) {
     const content = await fs.readFile(filePath, 'utf8')
     node.hasDefinePage ||= content.includes('definePage')
     const definedPageNameAndPath = extractDefinePageNameAndPath(content, filePath)
@@ -86,7 +91,7 @@ export function createRoutesContext(options: ResolvedOptions) {
     if (node.hasDefinePage && routeBlock) {
       logger.warn(`"${filePath}" has both "definePage" and "route" block, the "route" block will be ignored.`)
     }
-    node.update(filePath, {
+    node.setOverrides(filePath, {
       ...routeBlock,
       ...definedPageNameAndPath,
       ...definedPageMeta,
@@ -95,7 +100,7 @@ export function createRoutesContext(options: ResolvedOptions) {
 
   async function addPage({ filePath, routePath }: HandlerContext, triggerExtendRoute = false) {
     const node = routeTree.insert(routePath, filePath)
-    await flushChangesToNode(node, filePath)
+    await syncOverridesToNode(node, filePath)
 
     if (triggerExtendRoute) {
       options.extendRoute?.(new EditableTreeNode(node))
@@ -110,7 +115,7 @@ export function createRoutesContext(options: ResolvedOptions) {
       return
     }
 
-    await flushChangesToNode(node, filePath)
+    await syncOverridesToNode(node, filePath)
     logger.info(`updated "${routePath}" for "${filePath}"`)
     options.extendRoute?.(new EditableTreeNode(node))
     // no need to manually trigger the update of vue-router/auto-routes because
@@ -123,7 +128,7 @@ export function createRoutesContext(options: ResolvedOptions) {
   }
 
   function setupWatcher(watcher: RoutesFolderWatcher) {
-    logger.debug(`🤖 Scanning files in ${watcher.src}`)
+    logger.debug(`scanning files in ${watcher.src}`)
 
     return watcher
       .on('change', async (ctx) => {
