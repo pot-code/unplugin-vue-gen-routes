@@ -8,8 +8,6 @@ import { DefaultLogger } from './utils/logger.js'
 
 const logger = new DefaultLogger('options', 'warn')
 
-logger.warn('error test')
-
 /**
  * Options for a routes folder.
  */
