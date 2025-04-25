@@ -3,12 +3,8 @@ import type { TreeNode } from './tree'
 import type { RouteRecordOverride, TreeRouteParam } from './treeNodeValue'
 import { pascalCase } from 'scule'
 
-export function warn(msg: string, type: 'warn' | 'error' | 'debug' = 'warn'): void {
-  console[type](`⚠️  [unplugin-vue-gen-routes]: ${msg}`)
-}
-
-export function logTree(tree: TreeNode, log: (str: string) => any) {
-  log(printTree(tree))
+export function logTree(tree: TreeNode, log: (...str: string[]) => any) {
+  log('print tree', printTree(tree))
 }
 
 const MAX_LEVEL = 1000

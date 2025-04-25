@@ -1,6 +1,9 @@
 import type { RouteRecordRaw } from 'vue-router'
 import type { CustomRouteBlock } from './customBlock'
-import { joinPath, mergeRouteRecordOverride, warn } from './utils'
+import { DefaultLogger } from '../utils/logger'
+import { joinPath, mergeRouteRecordOverride } from './utils'
+
+const logger = new DefaultLogger('treeNodeValue', 'warn')
 
 export enum TreeNodeType {
   static,
@@ -253,7 +256,7 @@ export function createTreeNodeValue(
   if (options.format === 'file' && openingPar >= 0) {
     const closingPar = segment.lastIndexOf(')')
     if (closingPar < 0 || closingPar < openingPar) {
-      warn(`Segment "${segment}" is missing the closing ")". It will be treated as a static segment.`)
+      logger.warn(`segment "${segment}" is missing the closing ")". It will be treated as a static segment.`)
 
       // avoid parsing errors
       return new TreeNodeValueStatic(segment, parent, segment)

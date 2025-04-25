@@ -25,30 +25,31 @@ interface Logger {
 
 export class DefaultLogger implements Logger {
   level: number
-  prefix = '[unplugin-vue-gen-routes]'
+  #context: string
 
-  constructor(level: 'debug' | 'info' | 'warn' | 'error' = 'info') {
+  constructor(context: string = 'root', level: 'debug' | 'info' | 'warn' | 'error' = 'info') {
     this.level = parseLogLevel(level)
+    this.#context = `[unplugin-vue-gen-routes](${context})`
   }
 
   debug = (...args: any[]) => {
     if (this.level > 0) return
-    console.log(this.prefix, '[debug]', ...args)
+    console.log(this.#context, 'DEBUG', ...args)
   }
 
   info = (...args: any[]) => {
     if (this.level > 1) return
-    console.log(this.prefix, '[info]', ...args)
+    console.log(this.#context, 'INFO ', ...args)
   }
 
   warn = (...args: any[]) => {
     if (this.level > 2) return
-    console.warn(this.prefix, '[warn]', ...args)
+    console.warn(this.#context, 'WARN ', ...args)
   }
 
   error = (...args: any[]) => {
     if (this.level > 3) return
-    console.error(this.prefix, '[error]', ...args)
+    console.error(this.#context, 'ERROR', ...args)
   }
 
   time = (name: string) => {
@@ -63,7 +64,7 @@ export class DefaultLogger implements Logger {
 
   timeLog = (name: string, ...args: any[]) => {
     if (this.level > 0) return
-    console.timeLog(name, '[debug]', ...args)
+    console.timeLog(name, this.#context, 'debug:', ...args)
   }
 }
 

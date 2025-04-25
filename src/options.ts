@@ -3,7 +3,12 @@ import type { TreeNode } from './core/tree.js'
 import type { ParseSegmentOptions } from './core/treeNodeValue.js'
 import type { _Awaitable } from './utils/ts.js'
 import { resolve } from 'pathe'
-import { getFileBasedRouteName, isArray, warn } from './core/utils.js'
+import { getFileBasedRouteName, isArray } from './core/utils.js'
+import { DefaultLogger } from './utils/logger.js'
+
+const logger = new DefaultLogger('options', 'warn')
+
+logger.warn('error test')
 
 /**
  * Options for a routes folder.
@@ -272,7 +277,7 @@ export function resolveOptions(options: Options) {
       // in src/index.ts
       .map((ext) => {
         if (!ext.startsWith('.')) {
-          warn(`Invalid extension "${ext}". Extensions must start with a dot.`)
+          logger.warn(`Invalid extension "${ext}". Extensions must start with a dot.`)
           return `.${ext}`
         }
         return ext

@@ -1,7 +1,9 @@
 import type { RouteMeta } from 'vue-router'
 import type { CustomRouteBlock } from './customBlock'
 import type { TreeNode } from './tree'
-import { warn } from './utils'
+import { DefaultLogger } from '../utils/logger'
+
+const logger = new DefaultLogger('extendRoutes', 'warn')
 
 /**
  * A route node that can be modified by the user. The tree can be iterated to be traversed.
@@ -143,7 +145,7 @@ export class EditableTreeNode {
    */
   set path(path: string) {
     if (!path.startsWith('/')) {
-      warn(`Only absolute paths are supported. Make sure that "${path}" starts with a slash "/".`)
+      logger.warn(`Only absolute paths are supported. Make sure that "${path}" starts with a slash "/".`)
       return
     }
     this.node.value.addEditOverride({ path })

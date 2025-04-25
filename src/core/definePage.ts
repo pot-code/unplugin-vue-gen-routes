@@ -2,9 +2,10 @@ import type { CallExpression, Node, ObjectExpression, ObjectProperty, Program, S
 import path from 'node:path'
 import { babelParse, generateTransform, getLang, isCallOf, MagicString, parseSFC } from '@vue-macros/common'
 import { parseObjectNodeToJavascriptObject } from '../utils/babel'
-import { warn } from './utils'
+import { DefaultLogger } from '../utils/logger'
+import { MACRO_DEFINE_PAGE } from './constants'
 
-export const MACRO_DEFINE_PAGE = 'definePage'
+const logger = new DefaultLogger('definePage', 'warn')
 
 function isStringLiteral(node: Node | null | undefined): node is StringLiteral {
   return node?.type === 'StringLiteral'
@@ -88,7 +89,7 @@ export function definePageTransform(code: string, id: string) {
 // TODO: use
 export function extractRouteAlias(aliasValue: ObjectProperty['value'], id: string): string[] | void {
   if (aliasValue.type !== 'StringLiteral' && aliasValue.type !== 'ArrayExpression') {
-    warn(`route alias must be a string literal. Found in "${id}".`)
+    logger.warn(`route alias must be a string literal. Found in "${id}".`)
   } else {
     return aliasValue.type === 'StringLiteral'
       ? [aliasValue.value]

@@ -6,8 +6,9 @@ import fg from 'fast-glob'
 import { dirname, relative, resolve } from 'pathe'
 import { generateRouteRecord } from '../codegen/generateRouteRecords'
 import { DefaultLogger, NoopLogger } from '../utils/logger'
+import { MACRO_DEFINE_PAGE } from './constants'
 import { getRouteBlock } from './customBlock'
-import { extractDefinePageMeta as extractDefinePageData, MACRO_DEFINE_PAGE } from './definePage'
+import { extractDefinePageMeta as extractDefinePageData } from './definePage'
 import { EditableTreeNode } from './extendRoutes'
 import { resolveFolderOptions, RoutesFolderWatcher } from './RoutesFolderWatcher'
 import { PrefixTree } from './tree'
@@ -19,7 +20,7 @@ export function createRoutesContext(options: ResolvedOptions) {
   const routeTree = new PrefixTree(options)
   const editableRoutes = new EditableTreeNode(routeTree)
 
-  const logger = options.logs === false ? new NoopLogger() : new DefaultLogger(options.logs)
+  const logger = options.logs === false ? new NoopLogger() : new DefaultLogger('context', options.logs)
 
   const watchers: RoutesFolderWatcher[] = []
 

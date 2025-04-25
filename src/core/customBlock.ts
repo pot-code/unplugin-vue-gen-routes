@@ -4,7 +4,9 @@ import type { ResolvedOptions } from '../options'
 import { parse } from '@vue/compiler-sfc'
 import JSON5 from 'json5'
 import { parse as YAMLParser } from 'yaml'
-import { warn } from './utils'
+import { DefaultLogger } from '../utils/logger'
+
+const logger = new DefaultLogger('customBlock', 'warn')
 
 export function getRouteBlock(path: string, content: string, options: ResolvedOptions) {
   const parsedSFC = parse(content, { pad: 'space' }).descriptor
@@ -17,7 +19,7 @@ export function getRouteBlock(path: string, content: string, options: ResolvedOp
   // validation
   if (result) {
     if (result.path != null && !result.path.startsWith('/')) {
-      warn(`Overridden path must start with "/". Found in "${path}".`)
+      logger.warn(`Overridden path must start with "/". Found in "${path}".`)
     }
   }
 
@@ -36,22 +38,22 @@ function parseCustomBlock(block: SFCBlock, filePath: string, options: ResolvedOp
     try {
       return JSON5.parse(block.content)
     } catch (err: any) {
-      warn(`Invalid JSON5 format of <${block.type}> content in ${filePath}\n${err.message}`)
+      logger.warn(`Invalid JSON5 format of <${block.type}> content in ${filePath}\n${err.message}`)
     }
   } else if (lang === 'json') {
     try {
       return JSON.parse(block.content)
     } catch (err: any) {
-      warn(`Invalid JSON format of <${block.type}> content in ${filePath}\n${err.message}`)
+      logger.warn(`Invalid JSON format of <${block.type}> content in ${filePath}\n${err.message}`)
     }
   } else if (lang === 'yaml' || lang === 'yml') {
     try {
       return YAMLParser(block.content)
     } catch (err: any) {
-      warn(`Invalid YAML format of <${block.type}> content in ${filePath}\n${err.message}`)
+      logger.warn(`Invalid YAML format of <${block.type}> content in ${filePath}\n${err.message}`)
     }
   } else {
-    warn(
+    logger.warn(
       `Language "${lang}" for <${block.type}> is not supported. Supported languages are: json5, json, yaml, yml. Found in in ${filePath}.`,
     )
   }
