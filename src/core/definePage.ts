@@ -50,16 +50,23 @@ export function extractDefinePageMeta(code: string, id: string) {
     throw new SyntaxError(`duplicate definePage() call`)
   }
 
+  if (definePageNodes.length === 0) {
+    logger.error(`[${id}]: invalid definePage() call`)
+    return
+  }
+
   const definePageNode = definePageNodes[0]!
 
   const routeRecord = definePageNode.arguments[0]
 
   if (!routeRecord) {
-    throw new SyntaxError(`[${id}]: definePage() expects an object expression as its only argument`)
+    logger.error(`[${id}]: definePage() expects an object expression as its only argument`)
+    return
   }
 
   if (routeRecord.type !== 'ObjectExpression') {
-    throw new SyntaxError(`[${id}]: definePage() expects an object expression as its only argument`)
+    logger.error(`[${id}]: definePage() expects an object expression as its only argument`)
+    return
   }
 
   const object = parseObjectNodeToJavascriptObject(routeRecord as ObjectExpression)
@@ -76,6 +83,11 @@ export function definePageTransform(code: string, id: string) {
 
   if (definePageNodes.length > 1) {
     throw new SyntaxError(`duplicate definePage() call`)
+  }
+
+  if (definePageNodes.length === 0) {
+    logger.error(`[${id}]: invalid definePage() call`)
+    return
   }
 
   const definePageNode = definePageNodes[0]!
